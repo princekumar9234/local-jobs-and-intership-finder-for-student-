@@ -631,40 +631,14 @@
           };
 
           // Check if user is admin and show admin button
-          const isAdmin = user.user_metadata?.is_admin || true;
+          const isAdmin = user.user_metadata?.is_admin || true; // For now, all logged-in users can access
           if (isAdmin) {
             document.getElementById('adminNavItem').style.display = 'block';
           }
 
-          await loadUserApplications(user.email);
-
         } catch (error) {
           console.error('Error loading profile:', error);
         }
-      }
-
-      async function loadUserApplications(email) {
-        try {
-          const res = await fetch(`/api/admin/applications?email=${encodeURIComponent(email)}`);
-          const json = await res.json();
-          const list = json.applications || [];
-          const container = document.getElementById('applicationsList');
-          if (!list.length) {
-            container.innerHTML = '<p style="color:#666">No applications yet.</p>';
-            return;
-          }
-          container.innerHTML = list.slice(0, 10).map(a => `
-            <div class="application-card">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 style="color:#333;margin-bottom:5px;">${a.jobTitle || ''}</h5>
-                  <p style="color:#666;margin:0;">${a.companyName || ''}</p>
-                </div>
-                <span class="status-badge ${a.status === 'accepted' ? 'status-approved' : a.status === 'rejected' ? 'status-rejected' : 'status-pending'}">${a.status}</span>
-              </div>
-            </div>
-          `).join('');
-        } catch (e) {}
       }
 
       // Edit Profile Functions

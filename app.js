@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 8080;
+const port = 8080;
 const path = require("path");
 const authRoutes = require("./routes/auth");
 const applicationRoutes = require("./routes/application");
@@ -66,6 +66,6 @@ app.get("/index.ejs", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Listening on port :${port}`);
+  console.log("Listening on port :8080");
 });
 

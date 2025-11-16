@@ -3,7 +3,6 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const MAX_UPLOAD_MB = parseInt(process.env.MAX_UPLOAD_MB || '25');
 const supabase = require('../config/supabase');
 
 // Create uploads directory if it doesn't exist
@@ -42,7 +41,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: MAX_UPLOAD_MB * 1024 * 1024
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   },
   fileFilter: fileFilter
 });

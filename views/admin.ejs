@@ -336,12 +336,6 @@
           <!-- Jobs will be loaded here -->
         </div>
       </div>
-      <div class="admin-card jobs-list">
-        <h3 style="margin-bottom: 25px; color: #333;">
-          <i class="fas fa-clipboard-list"></i> All Applications
-        </h3>
-        <div id="applicationsList"></div>
-      </div>
     </div>
 
     <script>
@@ -529,68 +523,9 @@
         window.location.href = '/';
       }
 
-      async function loadApplications() {
-        try {
-          const res = await fetch('/api/admin/applications');
-          const json = await res.json();
-          const list = json.applications || [];
-          const container = document.getElementById('applicationsList');
-          if (!list.length) {
-            container.innerHTML = '<p style="text-align:center;color:#666;">No applications found.</p>';
-            return;
-          }
-          container.innerHTML = list.map(a => `
-            <div class="job-item">
-              <div class="job-item-info">
-                <h5>${a.jobTitle || ''}</h5>
-                <p><strong>${a.companyName || ''}</strong> • ${a.applicantName || ''} • ${a.applicantEmail || ''}</p>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="status-badge ${a.status === 'accepted' ? 'status-approved' : a.status === 'rejected' ? 'status-rejected' : 'status-pending'}">${a.status}</span>
-                <button class="btn btn-primary" onclick="viewApplication('${a.id}')">View</button>
-                <button class="btn btn-success" onclick="updateApplicationStatus('${a.id}','accepted', this)">Approve</button>
-                <button class="btn btn-danger" onclick="updateApplicationStatus('${a.id}','rejected', this)">Reject</button>
-              </div>
-            </div>
-          `).join('');
-        } catch (e) {}
-      }
-
-      async function viewApplication(id) {
-        try {
-          const res = await fetch(`/api/admin/applications/${id}`);
-          const json = await res.json();
-          if (json && json.application) {
-            alert(JSON.stringify(json.application, null, 2));
-          }
-        } catch (e) {}
-      }
-
-      async function updateApplicationStatus(id, status, btn) {
-        try {
-          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
-          const res = await fetch(`/api/admin/applications/${id}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-          });
-          const data = await res.json();
-          if (res.ok) {
-            if (status === 'accepted' && data && data.deleted) {
-              alert(data.message || 'Approved successfully');
-            }
-            loadApplications();
-          } else {
-            alert(data.error || 'Failed to update status');
-          }
-        } catch (e) {}
-        finally { if (btn) { btn.disabled = false; btn.innerHTML = status === 'accepted' ? 'Approve' : 'Reject'; } }
-      }
-
       // Initialize
       checkAdminAccess();
       loadJobs();
-      loadApplications();
     </script>
   </body>
 </html>

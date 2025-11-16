@@ -1,31 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const supabase = require('../config/supabase');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const MAX_UPLOAD_MB = parseInt(process.env.MAX_UPLOAD_MB || '25');
-const localBaseDir = path.join(__dirname, '../data/local_storage');
-const localResumesDir = path.join(localBaseDir, 'resumes');
-const localApplicationsDir = path.join(localBaseDir, 'applications');
-const applicationsDataPath = path.join(__dirname, '../data/applications.json');
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(localBaseDir)) {
-  fs.mkdirSync(localBaseDir, { recursive: true });
-}
-if (!fs.existsSync(localResumesDir)) {
-  fs.mkdirSync(localResumesDir, { recursive: true });
-}
-if (!fs.existsSync(localApplicationsDir)) {
-  fs.mkdirSync(localApplicationsDir, { recursive: true });
-}
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(applicationsDataPath)) {
-  fs.writeFileSync(applicationsDataPath, JSON.stringify([], null, 2));
-}
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../public/uploads/resumes');
@@ -63,7 +41,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: MAX_UPLOAD_MB * 1024 * 1024
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   },
   fileFilter: fileFilter
 });
@@ -101,84 +79,15 @@ router.post('/apply', upload.single('resumeFile'), async (req, res) => {
       return res.status(400).json({ error: 'All required fields must be filled' });
     }
 
+    // Get resume file info if uploaded
     let resumeInfo = null;
-    let supabaseResumePath = null;
-    let supabaseApplicationPath = null;
-    const uploadErrors = [];
-    let applicationData = null;
-
-    async function ensureBuckets() {
-      try {
-        const { data: buckets } = await supabase.storage.listBuckets();
-        const names = (buckets || []).map(b => b.name);
-        if (!names.includes('resumes')) {
-          await supabase.storage.createBucket('resumes', { public: false });
-        }
-        if (!names.includes('applications')) {
-          await supabase.storage.createBucket('applications', { public: false });
-        }
-      } catch (e) {}
-    }
-
-    await ensureBuckets();
     if (req.file) {
       resumeInfo = {
         filename: req.file.filename,
         originalname: req.file.originalname,
         path: req.file.path,
-        size: req.file.size,
-        mimetype: req.file.mimetype
+        size: req.file.size
       };
-      try {
-        const fileBuffer = fs.readFileSync(req.file.path);
-        const resumeStoragePath = `resumes/${Date.now()}-${(applicantEmail || 'unknown').replace(/[^a-zA-Z0-9@._-]/g, '')}-${req.file.originalname}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('resumes')
-          .upload(resumeStoragePath, fileBuffer, { contentType: req.file.mimetype });
-        if (uploadError) {
-          console.error('Supabase resume upload error:', uploadError.message);
-          uploadErrors.push({ stage: 'resume', message: uploadError.message || 'Unknown error' });
-        } else {
-          supabaseResumePath = uploadData.path;
-        }
-      } catch (e) {
-        console.error('Resume upload processing error:', e.message);
-        uploadErrors.push({ stage: 'resume', message: e.message || 'Processing error' });
-      }
-    }
-
-    try {
-      applicationData = {
-        jobId: jobId || null,
-        jobTitle,
-        companyName,
-        applicantName,
-        applicantEmail,
-        applicantPhone,
-        applicantLocation,
-        coverLetter,
-        resume: {
-          originalname: resumeInfo?.originalname || null,
-          size: resumeInfo?.size || null,
-          mimetype: resumeInfo?.mimetype || null,
-          supabasePath: supabaseResumePath
-        },
-        submittedAt: new Date().toISOString()
-      };
-      const jsonBuffer = Buffer.from(JSON.stringify(applicationData));
-      const applicationStoragePath = `applications/${Date.now()}-${(applicantEmail || 'unknown').replace(/[^a-zA-Z0-9@._-]/g, '')}-${(jobTitle || 'job').replace(/[^a-zA-Z0-9._-]/g, '_')}.json`;
-      const { data: appUploadData, error: appUploadError } = await supabase.storage
-        .from('applications')
-        .upload(applicationStoragePath, jsonBuffer, { contentType: 'application/json' });
-      if (appUploadError) {
-        console.error('Supabase application JSON upload error:', appUploadError.message);
-        uploadErrors.push({ stage: 'application_json', message: appUploadError.message || 'Unknown error' });
-      } else {
-        supabaseApplicationPath = appUploadData.path;
-      }
-    } catch (e) {
-      console.error('Application JSON upload error:', e.message);
-      uploadErrors.push({ stage: 'application_json', message: e.message || 'Processing error' });
     }
 
     // Email content for applicant
@@ -248,88 +157,24 @@ router.post('/apply', upload.single('resumeFile'), async (req, res) => {
       }] : []
     };
 
-    let emailOk = true;
-    try {
-      await transporter.sendMail(applicantMailOptions);
-      await transporter.sendMail(employerMailOptions);
-    } catch (emailErr) {
-      emailOk = false;
-      console.error('Email send failure:', emailErr.message);
-    }
+    // Send emails
+    await transporter.sendMail(applicantMailOptions);
+    await transporter.sendMail(employerMailOptions);
 
     // Clean up: Delete file after sending (optional - you might want to keep it)
     // if (resumeInfo) {
     //   fs.unlinkSync(resumeInfo.path);
     // }
 
-    if (!supabaseResumePath && !supabaseApplicationPath) {
-      try {
-        let localResumePath = null;
-        if (req.file) {
-          const destResume = path.join(localResumesDir, req.file.filename);
-          fs.copyFileSync(req.file.path, destResume);
-          localResumePath = destResume;
-        }
-        const appFileName = `${Date.now()}-${(applicantEmail || 'unknown').replace(/[^a-zA-Z0-9@._-]/g, '')}-${(jobTitle || 'job').replace(/[^a-zA-Z0-9._-]/g, '_')}.json`;
-        const destApp = path.join(localApplicationsDir, appFileName);
-        const localData = {
-          ...applicationData,
-          resume: {
-            ...applicationData.resume,
-            localPath: localResumePath
-          }
-        };
-        fs.writeFileSync(destApp, JSON.stringify(localData));
-        supabaseResumePath = localResumePath ? `local:${localResumePath}` : null;
-        supabaseApplicationPath = `local:${destApp}`;
-      } catch (e) {
-        return res.status(500).json({ 
-          error: 'Failed to store application in Supabase storage',
-          details: 'Resume and application JSON uploads failed',
-          errors: uploadErrors,
-          fallbackError: e.message
-        });
-      }
-    }
-
     res.json({ 
-      message: 'Application submitted successfully',
-      success: true,
-      storage: {
-        resumePath: supabaseResumePath || null,
-        applicationPath: supabaseApplicationPath || null
-      },
-      emailSent: emailOk
+      message: 'Application submitted successfully! Check your email for confirmation.',
+      success: true 
     });
 
-    try {
-      const raw = fs.readFileSync(applicationsDataPath, 'utf8');
-      const list = JSON.parse(raw || '[]');
-      const id = `${Date.now()}-${Math.floor(Math.random()*1e9)}`;
-      const item = {
-        id,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        jobId: jobId?.toString() || null,
-        jobTitle,
-        companyName,
-        applicantName,
-        applicantEmail,
-        applicantPhone,
-        applicantLocation,
-        coverLetter,
-        storage: {
-          resumePath: supabaseResumePath || null,
-          applicationPath: supabaseApplicationPath || null
-        },
-        updatedAt: new Date().toISOString()
-      };
-      list.push(item);
-      fs.writeFileSync(applicationsDataPath, JSON.stringify(list, null, 2));
-    } catch (e) {}
-
   } catch (error) {
-    console.error('Application submission error:', error);
+    console.error('Error sending email:', error);
+    
+    // Delete uploaded file if error occurs
     if (req.file) {
       try {
         fs.unlinkSync(req.file.path);
@@ -337,8 +182,9 @@ router.post('/apply', upload.single('resumeFile'), async (req, res) => {
         console.error('Error deleting file:', unlinkError);
       }
     }
+    
     res.status(500).json({ 
-      error: 'Failed to submit application',
+      error: 'Failed to submit application. Please try again later.',
       details: error.message 
     });
   }
