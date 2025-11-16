@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>JobFinder - Find Your Dream Job or Internship</title>
+    <style>
+      .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 85px 20px;
+        text-align: center;
+        color: white;
+        height: 500px;
+        margin-top: 0;
+      }
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+        padding: 20px;
+        animation: fadeInUp 1s ease-out;
+      }
+      .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 24px;
+        opacity: 0.95;
+      }
+      .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+        padding: 40px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .job-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid #f0f0f0;
+      }
+      .job-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+      .job-type-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+      .badge-internship {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      .badge-fulltime {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      .badge-parttime {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .job-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .job-company {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .job-location {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
+      .job-salary {
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+      .job-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 15px;
+      }
+      .job-tag {
+        background: #f0f4ff;
+        color: #667eea;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+      }
+      .apply-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+      }
+      .apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      /* Application Modal Styles */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .application-modal {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.5rem;
+      }
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s;
+      }
+      .close-modal:hover {
+        color: #333;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .form-group input,
+      .form-group textarea,
+      .form-group input[type="file"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: border-color 0.3s;
+        font-family: inherit;
+      }
+      .form-group input[type="file"] {
+        cursor: pointer;
+        background: #f8f9fa;
+      }
+      .form-group input[type="file"]:hover {
+        background: #f0f0f0;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+      .submit-application-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+      .submit-application-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      .submit-application-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .success-message {
+        display: none;
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .error-message {
+        display: none;
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <section>
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">
+          <img
+            src="/image/image.png"
+            class="logo"
+            alt="JobFinder Logo"
+          />JobFinder
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/viewjob.html">Jobs</a>
+            </li>
+            <li class="nav-item" id="profileNavItem" style="display: none">
+              <a class="nav-link" href="/profile.html" id="profileLink"
+                >Profile</a
+              >
+            </li>
+            <li class="nav-item" id="adminNavItem" style="display: none">
+              <a class="nav-link" href="/admin.html" id="adminLink">
+                <i class="fas fa-user-shield"></i> Admin
+              </a>
+            </li>
+            <li class="nav-item" id="authNavItem">
+              <a class="nav-link" href="/login.html" id="authLink">Login</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </section>
+
+    <div class="hero-section">
+      <marquee
+        ><h1 class="hero-title">Find Your Dream Job or Internship</h1>
+      </marquee>
+      <p class="hero-subtitle">
+        <i class="fa-solid fa-handshake"></i> Connecting Students With Verified
+        Local Employers And Mentorship
+      </p>
+      <div class="search-box">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search jobs, skills, companies..."
+          onkeypress="handleSearchKeyPress(event)"
+        />
+        <input
+          type="text"
+          id="locationInput"
+          placeholder="Search by Indian State (e.g., Maharashtra, Delhi, Karnataka)"
+          list="indianStates"
+          onkeypress="handleSearchKeyPress(event)"
+        />
+        <datalist id="indianStates">
+          <option value="Andhra Pradesh"></option>
+          <option value="Arunachal Pradesh"></option>
+          <option value="Assam"></option>
+          <option value="Bihar"></option>
+          <option value="Chhattisgarh"></option>
+          <option value="Goa"></option>
+          <option value="Gujarat"></option>
+          <option value="Haryana"></option>
+          <option value="Himachal Pradesh"></option>
+          <option value="Jharkhand"></option>
+          <option value="Karnataka"></option>
+          <option value="Kerala"></option>
+          <option value="Madhya Pradesh"></option>
+          <option value="Maharashtra"></option>
+          <option value="Manipur"></option>
+          <option value="Meghalaya"></option>
+          <option value="Mizoram"></option>
+          <option value="Nagaland"></option>
+          <option value="Odisha"></option>
+          <option value="Punjab"></option>
+          <option value="Rajasthan"></option>
+          <option value="Sikkim"></option>
+          <option value="Tamil Nadu"></option>
+          <option value="Telangana"></option>
+          <option value="Tripura"></option>
+          <option value="Uttar Pradesh"></option>
+          <option value="Uttarakhand"></option>
+          <option value="West Bengal"></option>
+          <option value="Delhi"></option>
+          <option value="Mumbai"></option>
+          <option value="Bangalore"></option>
+          <option value="Hyderabad"></option>
+          <option value="Chennai"></option>
+          <option value="Kolkata"></option>
+          <option value="Pune"></option>
+          <option value="Ahmedabad"></option>
+        </datalist>
+
+        <button class="search-btn" onclick="performSearch()">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </div>
+    </div>
+
+    <div class="category-main">
+      <section style="background: #f8f9fa; padding: 50px 20px">
+        <div style="max-width: 1400px; margin: 0 auto">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #333">
+            Featured Jobs & Internships
+          </h2>
+          <div id="jobsContainer" class="jobs-grid">
+            <!-- Jobs will be dynamically loaded here -->
+          </div>
+          <div id="noResults" class="no-results" style="display: none">
+            <i
+              class="fas fa-search"
+              style="font-size: 48px; margin-bottom: 20px; opacity: 0.3"
+            ></i>
+            <h3>No jobs found</h3>
+            <p>Try adjusting your search criteria</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>© 2025 JobFinder. All rights reserved.</footer>
+    </div>
+
+    <!-- Application Modal -->
+    <div class="modal-overlay" id="applicationModal">
+      <div class="application-modal">
+        <div class="modal-header">
+          <h3 id="modalJobTitle">Apply for Job</h3>
+          <button class="close-modal" onclick="closeApplicationModal()">
+            &times;
+          </button>
+        </div>
+        <div class="success-message" id="successMessage">
+          <i class="fas fa-check-circle"></i> Application submitted
+          successfully! We'll send you a confirmation email.
+        </div>
+        <div class="error-message" id="errorMessage">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="errorText">An error occurred. Please try again.</span>
+        </div>
+        <form id="applicationForm">
+          <input type="hidden" id="jobId" name="jobId" />
+          <input type="hidden" id="jobTitle" name="jobTitle" />
+          <input type="hidden" id="companyName" name="companyName" />
+
+          <div class="form-group">
+            <label for="applicantName">Full Name *</label>
+            <input
+              type="text"
+              id="applicantName"
+              name="applicantName"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="applicantEmail">Email Address *</label>
+            <input
+              type="email"
+              id="applicantEmail"
+              name="applicantEmail"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="applicantPhone">Phone Number *</label>
+            <input
+              type="tel"
+              id="applicantPhone"
+              name="applicantPhone"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="applicantLocation">Location *</label>
+            <input
+              type="text"
+              id="applicantLocation"
+              name="applicantLocation"
+              placeholder="City, State"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="coverLetter">Cover Letter *</label>
+            <textarea
+              id="coverLetter"
+              name="coverLetter"
+              placeholder="Tell us why you're interested in this position..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="resumeFile">Upload Resume (Optional)</label>
+            <input
+              type="file"
+              id="resumeFile"
+              name="resumeFile"
+              accept=".pdf,.doc,.docx"
+            />
+            <small
+              style="
+                color: #666;
+                font-size: 12px;
+                display: block;
+                margin-top: 5px;
+              "
+            >
+              Accepted formats: PDF, DOC, DOCX (Max 5MB)
+            </small>
+            <div
+              id="resumeFileName"
+              style="
+                margin-top: 8px;
+                color: #667eea;
+                font-size: 14px;
+                display: none;
+              "
+            >
+              <i class="fas fa-file"></i> <span id="fileName"></span>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-application-btn" id="submitBtn">
+            <i class="fas fa-paper-plane"></i> Submit Application
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Indian States List
+      const indianStates = [
+        "Andhra Pradesh",
+        "Arunachal Pradesh",
+        "Assam",
+        "Bihar",
+        "Chhattisgarh",
+        "Goa",
+        "Gujarat",
+        "Haryana",
+        "Himachal Pradesh",
+        "Jharkhand",
+        "Karnataka",
+        "Kerala",
+        "Madhya Pradesh",
+        "Maharashtra",
+        "Manipur",
+        "Meghalaya",
+        "Mizoram",
+        "Nagaland",
+        "Odisha",
+        "Punjab",
+        "Rajasthan",
+        "Sikkim",
+        "Tamil Nadu",
+        "Telangana",
+        "Tripura",
+        "Uttar Pradesh",
+        "Uttarakhand",
+        "West Bengal",
+        "Delhi",
+      ];
+
+      // Demo jobs data with Indian locations - Multiple jobs per location
+      const jobsData = [
+        // Bangalore, Karnataka Jobs
+        {
+          id: 1,
+          title: "Software Developer Intern",
+          company: "Tech Solutions India",
+          location: "Bangalore, Karnataka",
+          state: "Karnataka",
+          type: "internship",
+          salary: "₹25,000 - ₹40,000/month",
+          category: "Technology",
+          tags: ["React", "Node.js", "JavaScript"],
+          description:
+            "Join our team as a software developer intern and work on cutting-edge projects in India's Silicon Valley.",
+        },
+        {
+          id: 9,
+          title: "UI/UX Designer",
+          company: "Creative Agency",
+          location: "Bangalore, Karnataka",
+          state: "Karnataka",
+          type: "fulltime",
+          salary: "₹5,00,000 - ₹10,00,000/year",
+          category: "Technology",
+          tags: ["Design", "Figma", "User Experience"],
+          description:
+            "Create beautiful and intuitive user interfaces for web and mobile apps.",
+        },
+        {
+          id: 16,
+          title: "DevOps Engineer Intern",
+          company: "Cloud Tech Bangalore",
+          location: "Bangalore, Karnataka",
+          state: "Karnataka",
+          type: "internship",
+          salary: "₹30,000 - ₹45,000/month",
+          category: "Technology",
+          tags: ["Docker", "Kubernetes", "AWS"],
+          description:
+            "Learn DevOps practices and work with cloud infrastructure in Bangalore.",
+        },
+        {
+          id: 17,
+          title: "Machine Learning Intern",
+          company: "AI Research Labs",
+          location: "Bangalore, Karnataka",
+          state: "Karnataka",
+          type: "internship",
+          salary: "₹35,000 - ₹50,000/month",
+          category: "Technology",
+          tags: ["ML", "Python", "TensorFlow"],
+          description:
+            "Work on cutting-edge ML projects with experienced data scientists.",
+        },
+        {
+          id: 18,
+          title: "Full Stack Developer",
+          company: "Startup Incubator",
+          location: "Bangalore, Karnataka",
+          state: "Karnataka",
+          type: "fulltime",
+          salary: "₹8,00,000 - ₹15,00,000/year",
+          category: "Technology",
+          tags: ["MERN", "MongoDB", "React"],
+          description:
+            "Build scalable web applications for fast-growing startups.",
+        },
+
+        // Mumbai, Maharashtra Jobs
+        {
+          id: 2,
+          title: "Frontend Developer",
+          company: "Design Studio Mumbai",
+          location: "Mumbai, Maharashtra",
+          state: "Maharashtra",
+          type: "fulltime",
+          salary: "₹6,00,000 - ₹12,00,000/year",
+          category: "Technology",
+          tags: ["React", "Vue.js", "CSS"],
+          description:
+            "We're looking for an experienced frontend developer to join our creative team in Mumbai.",
+        },
+        {
+          id: 7,
+          title: "Backend Developer",
+          company: "Cloud Services India",
+          location: "Pune, Maharashtra",
+          state: "Maharashtra",
+          type: "fulltime",
+          salary: "₹8,00,000 - ₹15,00,000/year",
+          category: "Technology",
+          tags: ["Node.js", "Python", "AWS"],
+          description:
+            "Build scalable backend systems for cloud-based applications.",
+        },
+        {
+          id: 14,
+          title: "Digital Marketing Executive",
+          company: "E-commerce Platform",
+          location: "Mumbai, Maharashtra",
+          state: "Maharashtra",
+          type: "fulltime",
+          salary: "₹4,00,000 - ₹8,00,000/year",
+          category: "Business",
+          tags: ["Digital Marketing", "Google Ads", "Social Media"],
+          description:
+            "Manage digital marketing campaigns and drive online growth.",
+        },
+        {
+          id: 19,
+          title: "Sales Intern",
+          company: "FinTech Solutions",
+          location: "Mumbai, Maharashtra",
+          state: "Maharashtra",
+          type: "internship",
+          salary: "₹18,000 - ₹28,000/month",
+          category: "Business",
+          tags: ["Sales", "Customer Relations", "B2B"],
+          description:
+            "Learn sales strategies and work with enterprise clients in Mumbai.",
+        },
+        {
+          id: 20,
+          title: "Content Marketing Intern",
+          company: "Media House Mumbai",
+          location: "Mumbai, Maharashtra",
+          state: "Maharashtra",
+          type: "internship",
+          salary: "₹20,000 - ₹30,000/month",
+          category: "Business",
+          tags: ["Content", "SEO", "Social Media"],
+          description:
+            "Create engaging content for digital platforms and social media.",
+        },
+        {
+          id: 21,
+          title: "React Native Developer",
+          company: "Mobile App Studio",
+          location: "Mumbai, Maharashtra",
+          state: "Maharashtra",
+          type: "fulltime",
+          salary: "₹7,00,000 - ₹13,00,000/year",
+          category: "Technology",
+          tags: ["React Native", "Mobile", "iOS"],
+          description:
+            "Develop cross-platform mobile applications using React Native.",
+        },
+        {
+          id: 22,
+          title: "HR Intern",
+          company: "Talent Acquisition Firm",
+          location: "Pune, Maharashtra",
+          state: "Maharashtra",
+          type: "internship",
+          salary: "₹15,000 - ₹25,000/month",
+          category: "Business",
+          tags: ["HR", "Recruitment", "Talent Management"],
+          description:
+            "Learn HR practices and assist in recruitment processes.",
+        },
+
+        // Delhi Jobs
+        {
+          id: 3,
+          title: "Marketing Intern",
+          company: "Digital Marketing Pro",
+          location: "Delhi",
+          state: "Delhi",
+          type: "internship",
+          salary: "₹20,000 - ₹30,000/month",
+          category: "Business",
+          tags: ["Marketing", "Social Media", "SEO"],
+          description:
+            "Learn digital marketing strategies and work with real clients in the capital city.",
+        },
+        {
+          id: 6,
+          title: "Teaching Assistant",
+          company: "IIT Delhi",
+          location: "Delhi",
+          state: "Delhi",
+          type: "parttime",
+          salary: "₹500 - ₹800/hour",
+          category: "Education",
+          tags: ["Teaching", "Education", "Student Support"],
+          description:
+            "Support students and assist professors in educational activities at IIT Delhi.",
+        },
+        {
+          id: 23,
+          title: "Graphic Designer Intern",
+          company: "Creative Studio Delhi",
+          location: "Delhi",
+          state: "Delhi",
+          type: "internship",
+          salary: "₹18,000 - ₹28,000/month",
+          category: "Technology",
+          tags: ["Photoshop", "Illustrator", "Design"],
+          description:
+            "Create visual designs for brands and digital campaigns.",
+        },
+        {
+          id: 24,
+          title: "Business Development Intern",
+          company: "Consulting Firm",
+          location: "Delhi",
+          state: "Delhi",
+          type: "internship",
+          salary: "₹22,000 - ₹32,000/month",
+          category: "Business",
+          tags: ["Business Development", "Client Relations", "Strategy"],
+          description:
+            "Work on business development strategies and client acquisition.",
+        },
+        {
+          id: 25,
+          title: "Data Analyst",
+          company: "Analytics Solutions",
+          location: "Delhi",
+          state: "Delhi",
+          type: "fulltime",
+          salary: "₹5,00,000 - ₹9,00,000/year",
+          category: "Technology",
+          tags: ["Data Analysis", "Excel", "SQL"],
+          description:
+            "Analyze business data and create insights for decision making.",
+        },
+        {
+          id: 26,
+          title: "Web Developer Intern",
+          company: "Web Solutions Delhi",
+          location: "Delhi",
+          state: "Delhi",
+          type: "internship",
+          salary: "₹20,000 - ₹35,000/month",
+          category: "Technology",
+          tags: ["HTML", "CSS", "JavaScript"],
+          description:
+            "Build responsive websites and learn modern web development.",
+        },
+
+        // Hyderabad, Telangana Jobs
+        {
+          id: 4,
+          title: "Data Science Intern",
+          company: "AI Solutions Hyderabad",
+          location: "Hyderabad, Telangana",
+          state: "Telangana",
+          type: "internship",
+          salary: "₹30,000 - ₹45,000/month",
+          category: "Technology",
+          tags: ["Python", "Machine Learning", "Data Analysis"],
+          description:
+            "Work with big data and machine learning models in a fast-paced environment.",
+        },
+        {
+          id: 15,
+          title: "Python Developer Intern",
+          company: "Data Analytics Firm",
+          location: "Hyderabad, Telangana",
+          state: "Telangana",
+          type: "internship",
+          salary: "₹28,000 - ₹42,000/month",
+          category: "Technology",
+          tags: ["Python", "Django", "Data Science"],
+          description:
+            "Work on Python-based web applications and data analysis projects.",
+        },
+        {
+          id: 27,
+          title: "Java Developer",
+          company: "Enterprise Solutions",
+          location: "Hyderabad, Telangana",
+          state: "Telangana",
+          type: "fulltime",
+          salary: "₹7,00,000 - ₹14,00,000/year",
+          category: "Technology",
+          tags: ["Java", "Spring Boot", "Microservices"],
+          description:
+            "Develop enterprise-level applications using Java and Spring framework.",
+        },
+        {
+          id: 28,
+          title: "Cybersecurity Intern",
+          company: "Security Solutions",
+          location: "Hyderabad, Telangana",
+          state: "Telangana",
+          type: "internship",
+          salary: "₹25,000 - ₹40,000/month",
+          category: "Technology",
+          tags: ["Security", "Ethical Hacking", "Network"],
+          description:
+            "Learn cybersecurity practices and work on security assessments.",
+        },
+
+        // Chennai, Tamil Nadu Jobs
+        {
+          id: 5,
+          title: "Nurse Practitioner",
+          company: "Apollo Hospitals",
+          location: "Chennai, Tamil Nadu",
+          state: "Tamil Nadu",
+          type: "fulltime",
+          salary: "₹4,00,000 - ₹8,00,000/year",
+          category: "Healthcare",
+          tags: ["Healthcare", "Patient Care", "Medical"],
+          description:
+            "Join our healthcare team and make a difference in patients' lives.",
+        },
+        {
+          id: 29,
+          title: "Software Testing Intern",
+          company: "QA Solutions",
+          location: "Chennai, Tamil Nadu",
+          state: "Tamil Nadu",
+          type: "internship",
+          salary: "₹20,000 - ₹35,000/month",
+          category: "Technology",
+          tags: ["Testing", "Selenium", "Automation"],
+          description:
+            "Learn software testing methodologies and automation tools.",
+        },
+        {
+          id: 30,
+          title: "Medical Intern",
+          company: "City Hospital",
+          location: "Chennai, Tamil Nadu",
+          state: "Tamil Nadu",
+          type: "internship",
+          salary: "₹15,000 - ₹25,000/month",
+          category: "Healthcare",
+          tags: ["Medical", "Healthcare", "Hospital"],
+          description:
+            "Gain hands-on experience in hospital operations and patient care.",
+        },
+        {
+          id: 31,
+          title: "Database Administrator",
+          company: "IT Services",
+          location: "Chennai, Tamil Nadu",
+          state: "Tamil Nadu",
+          type: "fulltime",
+          salary: "₹6,00,000 - ₹12,00,000/year",
+          category: "Technology",
+          tags: ["SQL", "Database", "Oracle"],
+          description:
+            "Manage and optimize database systems for enterprise applications.",
+        },
+
+        // Other Locations
+        {
+          id: 8,
+          title: "Business Analyst Intern",
+          company: "Consulting Group",
+          location: "Gurgaon, Haryana",
+          state: "Haryana",
+          type: "internship",
+          salary: "₹25,000 - ₹35,000/month",
+          category: "Business",
+          tags: ["Analytics", "Business", "Data"],
+          description:
+            "Analyze business processes and help improve operational efficiency.",
+        },
+        {
+          id: 32,
+          title: "Finance Intern",
+          company: "Financial Services",
+          location: "Gurgaon, Haryana",
+          state: "Haryana",
+          type: "internship",
+          salary: "₹22,000 - ₹32,000/month",
+          category: "Business",
+          tags: ["Finance", "Accounting", "Analysis"],
+          description:
+            "Learn financial analysis and work on financial reporting.",
+        },
+        {
+          id: 10,
+          title: "Research Intern",
+          company: "Medical Research Lab",
+          location: "Kolkata, West Bengal",
+          state: "West Bengal",
+          type: "internship",
+          salary: "₹22,000 - ₹35,000/month",
+          category: "Healthcare",
+          tags: ["Research", "Healthcare", "Lab Work"],
+          description:
+            "Assist in medical research and contribute to groundbreaking studies.",
+        },
+        {
+          id: 33,
+          title: "Content Writer",
+          company: "Publishing House",
+          location: "Kolkata, West Bengal",
+          state: "West Bengal",
+          type: "fulltime",
+          salary: "₹3,00,000 - ₹6,00,000/year",
+          category: "Business",
+          tags: ["Writing", "Content", "Editorial"],
+          description:
+            "Create engaging content for books, articles, and digital media.",
+        },
+        {
+          id: 11,
+          title: "Full Stack Developer",
+          company: "Startup Hub",
+          location: "Ahmedabad, Gujarat",
+          state: "Gujarat",
+          type: "fulltime",
+          salary: "₹7,00,000 - ₹14,00,000/year",
+          category: "Technology",
+          tags: ["MERN Stack", "MongoDB", "Express"],
+          description:
+            "Work on full-stack development projects in a dynamic startup environment.",
+        },
+        {
+          id: 34,
+          title: "Marketing Executive",
+          company: "Retail Solutions",
+          location: "Ahmedabad, Gujarat",
+          state: "Gujarat",
+          type: "fulltime",
+          salary: "₹4,00,000 - ₹7,00,000/year",
+          category: "Business",
+          tags: ["Marketing", "Retail", "Branding"],
+          description:
+            "Develop marketing strategies for retail and e-commerce brands.",
+        },
+        {
+          id: 12,
+          title: "Content Writer Intern",
+          company: "Media House",
+          location: "Jaipur, Rajasthan",
+          state: "Rajasthan",
+          type: "internship",
+          salary: "₹15,000 - ₹25,000/month",
+          category: "Business",
+          tags: ["Content Writing", "SEO", "Blogging"],
+          description:
+            "Create engaging content for digital platforms and improve SEO rankings.",
+        },
+        {
+          id: 35,
+          title: "Tourism Intern",
+          company: "Travel Agency",
+          location: "Jaipur, Rajasthan",
+          state: "Rajasthan",
+          type: "internship",
+          salary: "₹12,000 - ₹20,000/month",
+          category: "Business",
+          tags: ["Tourism", "Travel", "Hospitality"],
+          description:
+            "Learn tourism management and work with travel planning.",
+        },
+        {
+          id: 13,
+          title: "Android Developer",
+          company: "Mobile Solutions",
+          location: "Noida, Uttar Pradesh",
+          state: "Uttar Pradesh",
+          type: "fulltime",
+          salary: "₹6,00,000 - ₹12,00,000/year",
+          category: "Technology",
+          tags: ["Android", "Kotlin", "Java"],
+          description:
+            "Develop innovative mobile applications for Android platform.",
+        },
+        {
+          id: 36,
+          title: "IT Support Intern",
+          company: "Tech Support Services",
+          location: "Noida, Uttar Pradesh",
+          state: "Uttar Pradesh",
+          type: "internship",
+          salary: "₹18,000 - ₹28,000/month",
+          category: "Technology",
+          tags: ["IT Support", "Troubleshooting", "Helpdesk"],
+          description:
+            "Provide technical support and learn IT infrastructure management.",
+        },
+      ];
+
+      let filteredJobs = [...jobsData];
+      let currentCategory = "all";
+      let allJobsData = [...jobsData]; // Combined jobs from hardcoded and API
+
+      // Initialize Supabase
+      const supabaseUrl = "https://anhstuyagypchntxujrq.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuaHN0dXlhZ3lwY2hudHh1anJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMzA2MDEsImV4cCI6MjA3ODgwNjYwMX0.mZwhowUemXQnNYR3cudtlmICiO2EcwzQfm1NZYWK8q8";
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+      // Load jobs from API
+      async function loadJobsFromAPI() {
+        try {
+          const response = await fetch("/api/admin/jobs");
+          const result = await response.json();
+
+          if (response.ok && result.jobs && result.jobs.length > 0) {
+            // Merge API jobs (admin-added) with hardcoded jobs
+            // Admin jobs have IDs starting from 1000, so no conflict
+            allJobsData = [...jobsData, ...result.jobs];
+            filteredJobs = [...allJobsData];
+            renderJobs(filteredJobs);
+          } else {
+            // If no admin jobs, use only hardcoded jobs
+            allJobsData = [...jobsData];
+            filteredJobs = [...jobsData];
+            renderJobs(filteredJobs);
+          }
+        } catch (error) {
+          console.error("Error loading jobs from API:", error);
+          // If API fails, use hardcoded jobs
+          allJobsData = [...jobsData];
+          filteredJobs = [...jobsData];
+          renderJobs(filteredJobs);
+        }
+      }
+
+      // Check authentication status
+      async function checkAuth() {
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session) {
+            const authLink = document.getElementById("authLink");
+            authLink.textContent = "Logout";
+            authLink.href = "#";
+            authLink.onclick = async (e) => {
+              e.preventDefault();
+              await supabase.auth.signOut();
+              window.location.reload();
+            };
+            document.getElementById("profileNavItem").style.display = "block";
+
+            // Check if user is admin (you can customize this logic)
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
+            const isAdmin = user?.user_metadata?.is_admin || true; // For now, all logged-in users can access
+            if (isAdmin) {
+              document.getElementById("adminNavItem").style.display = "block";
+            }
+          }
+        } catch (error) {
+          console.error("Auth check error:", error);
+        }
+      }
+
+      // Render jobs
+      function renderJobs(jobs) {
+        const container = document.getElementById("jobsContainer");
+        const noResults = document.getElementById("noResults");
+
+        if (jobs.length === 0) {
+          container.style.display = "none";
+          noResults.style.display = "block";
+          return;
+        }
+
+        container.style.display = "grid";
+        noResults.style.display = "none";
+
+        container.innerHTML = jobs
+          .map(
+            (job) => `
+          <div class="job-card" onclick="viewJob(${job.id})">
+            <span class="job-type-badge badge-${job.type}">
+              ${
+                job.type === "internship"
+                  ? "Internship"
+                  : job.type === "fulltime"
+                  ? "Full-time"
+                  : "Part-time"
+              }
+            </span>
+            <h3 class="job-title">${job.title}</h3>
+            <p class="job-company">
+              <i class="fas fa-building"></i> ${job.company}
+            </p>
+            <p class="job-location">
+              <i class="fas fa-map-marker-alt"></i> ${job.location}
+            </p>
+            <p class="job-salary">
+              <i class="fas fa-rupee-sign"></i> ${job.salary}
+            </p>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+              ${job.description}
+            </p>
+            <div class="job-tags">
+              ${job.tags
+                .map((tag) => `<span class="job-tag">${tag}</span>`)
+                .join("")}
+            </div>
+            <button class="apply-btn" onclick="event.stopPropagation(); applyToJob(${
+              job.id
+            })">
+              <i class="fas fa-paper-plane"></i> Apply Now
+            </button>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Search functionality with Indian states
+      function performSearch() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const locationTerm = document
+          .getElementById("locationInput")
+          .value.toLowerCase();
+
+        filteredJobs = allJobsData.filter((job) => {
+          const matchesSearch =
+            !searchTerm ||
+            job.title.toLowerCase().includes(searchTerm) ||
+            job.company.toLowerCase().includes(searchTerm) ||
+            job.description.toLowerCase().includes(searchTerm) ||
+            job.tags.some((tag) => tag.toLowerCase().includes(searchTerm));
+
+          // Enhanced location matching for Indian states
+          let matchesLocation = true;
+          if (locationTerm) {
+            const locationLower = locationTerm.toLowerCase();
+            matchesLocation =
+              job.location.toLowerCase().includes(locationLower) ||
+              job.state.toLowerCase().includes(locationLower) ||
+              // Match city names
+              (locationLower.includes("mumbai") &&
+                job.location.toLowerCase().includes("mumbai")) ||
+              (locationLower.includes("delhi") &&
+                job.location.toLowerCase().includes("delhi")) ||
+              (locationLower.includes("bangalore") &&
+                job.location.toLowerCase().includes("bangalore")) ||
+              (locationLower.includes("hyderabad") &&
+                job.location.toLowerCase().includes("hyderabad")) ||
+              (locationLower.includes("chennai") &&
+                job.location.toLowerCase().includes("chennai")) ||
+              (locationLower.includes("kolkata") &&
+                job.location.toLowerCase().includes("kolkata")) ||
+              (locationLower.includes("pune") &&
+                job.location.toLowerCase().includes("pune")) ||
+              (locationLower.includes("ahmedabad") &&
+                job.location.toLowerCase().includes("ahmedabad"));
+          }
+
+          const matchesCategory =
+            currentCategory === "all" || job.category === currentCategory;
+
+          return matchesSearch && matchesLocation && matchesCategory;
+        });
+
+        renderJobs(filteredJobs);
+      }
+
+      function handleSearchKeyPress(event) {
+        if (event.key === "Enter") {
+          performSearch();
+        }
+      }
+
+      function filterByCategory(category) {
+        currentCategory = category;
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const locationTerm = document
+          .getElementById("locationInput")
+          .value.toLowerCase();
+
+        filteredJobs = allJobsData.filter((job) => {
+          const matchesSearch =
+            !searchTerm ||
+            job.title.toLowerCase().includes(searchTerm) ||
+            job.company.toLowerCase().includes(searchTerm) ||
+            job.description.toLowerCase().includes(searchTerm) ||
+            job.tags.some((tag) => tag.toLowerCase().includes(searchTerm));
+
+          // Enhanced location matching for Indian states
+          let matchesLocation = true;
+          if (locationTerm) {
+            const locationLower = locationTerm.toLowerCase();
+            matchesLocation =
+              job.location.toLowerCase().includes(locationLower) ||
+              job.state.toLowerCase().includes(locationLower) ||
+              (locationLower.includes("mumbai") &&
+                job.location.toLowerCase().includes("mumbai")) ||
+              (locationLower.includes("delhi") &&
+                job.location.toLowerCase().includes("delhi")) ||
+              (locationLower.includes("bangalore") &&
+                job.location.toLowerCase().includes("bangalore")) ||
+              (locationLower.includes("hyderabad") &&
+                job.location.toLowerCase().includes("hyderabad")) ||
+              (locationLower.includes("chennai") &&
+                job.location.toLowerCase().includes("chennai")) ||
+              (locationLower.includes("kolkata") &&
+                job.location.toLowerCase().includes("kolkata")) ||
+              (locationLower.includes("pune") &&
+                job.location.toLowerCase().includes("pune")) ||
+              (locationLower.includes("ahmedabad") &&
+                job.location.toLowerCase().includes("ahmedabad"));
+          }
+
+          return matchesSearch && matchesLocation && job.category === category;
+        });
+
+        renderJobs(filteredJobs);
+      }
+
+      function viewJob(jobId) {
+        window.location.href = `/viewjob.html?id=${jobId}`;
+      }
+
+      let currentJobData = null;
+
+      async function applyToJob(jobId) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          alert("Please login to apply for jobs");
+          window.location.href = "/login.html";
+          return;
+        }
+
+        // Find the job data
+        const job = allJobsData.find((j) => j.id === jobId);
+        if (!job) {
+          alert("Job not found");
+          return;
+        }
+
+        currentJobData = job;
+
+        // Populate modal with job info
+        document.getElementById(
+          "modalJobTitle"
+        ).textContent = `Apply for ${job.title}`;
+        document.getElementById("jobId").value = job.id;
+        document.getElementById("jobTitle").value = job.title;
+        document.getElementById("companyName").value = job.company;
+
+        // Pre-fill user info if available
+        if (session.user) {
+          const user = session.user;
+          document.getElementById("applicantName").value =
+            user.user_metadata?.first_name && user.user_metadata?.last_name
+              ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+              : user.email?.split("@")[0] || "";
+          document.getElementById("applicantEmail").value = user.email || "";
+          document.getElementById("applicantPhone").value =
+            user.user_metadata?.phone || "";
+        }
+
+        // Show modal
+        document.getElementById("applicationModal").classList.add("active");
+        document.getElementById("successMessage").style.display = "none";
+        document.getElementById("errorMessage").style.display = "none";
+      }
+
+      function closeApplicationModal() {
+        document.getElementById("applicationModal").classList.remove("active");
+        document.getElementById("applicationForm").reset();
+        currentJobData = null;
+      }
+
+      // Show file name when file is selected
+      document
+        .getElementById("resumeFile")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            // Check file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+              alert("File size must be less than 5MB");
+              e.target.value = "";
+              document.getElementById("resumeFileName").style.display = "none";
+              return;
+            }
+            // Check file type
+            const allowedTypes = [
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ];
+            if (!allowedTypes.includes(file.type)) {
+              alert("Please upload a PDF, DOC, or DOCX file");
+              e.target.value = "";
+              document.getElementById("resumeFileName").style.display = "none";
+              return;
+            }
+            document.getElementById("fileName").textContent = file.name;
+            document.getElementById("resumeFileName").style.display = "block";
+          } else {
+            document.getElementById("resumeFileName").style.display = "none";
+          }
+        });
+
+      // Handle form submission
+      document
+        .getElementById("applicationForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const submitBtn = document.getElementById("submitBtn");
+          const successMsg = document.getElementById("successMessage");
+          const errorMsg = document.getElementById("errorMessage");
+
+          // Disable button
+          submitBtn.disabled = true;
+          submitBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+          // Hide previous messages
+          successMsg.style.display = "none";
+          errorMsg.style.display = "none";
+
+          // Create FormData for file upload
+          const formData = new FormData();
+          formData.append("jobId", document.getElementById("jobId").value);
+          formData.append(
+            "jobTitle",
+            document.getElementById("jobTitle").value
+          );
+          formData.append(
+            "companyName",
+            document.getElementById("companyName").value
+          );
+          formData.append(
+            "applicantName",
+            document.getElementById("applicantName").value
+          );
+          formData.append(
+            "applicantEmail",
+            document.getElementById("applicantEmail").value
+          );
+          formData.append(
+            "applicantPhone",
+            document.getElementById("applicantPhone").value
+          );
+          formData.append(
+            "applicantLocation",
+            document.getElementById("applicantLocation").value
+          );
+          formData.append(
+            "coverLetter",
+            document.getElementById("coverLetter").value
+          );
+
+          // Add resume file if selected
+          const resumeFile = document.getElementById("resumeFile").files[0];
+          if (resumeFile) {
+            formData.append("resumeFile", resumeFile);
+          }
+
+          try {
+            const response = await fetch("/api/apply", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              successMsg.style.display = "block";
+              document.getElementById("applicationForm").reset();
+              document.getElementById("resumeFileName").style.display = "none";
+
+              // Close modal after 2 seconds
+              setTimeout(() => {
+                closeApplicationModal();
+              }, 2000);
+            } else {
+              document.getElementById("errorText").textContent =
+                result.error || "Failed to submit application";
+              errorMsg.style.display = "block";
+            }
+          } catch (error) {
+            document.getElementById("errorText").textContent =
+              "Network error. Please try again.";
+            errorMsg.style.display = "block";
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML =
+              '<i class="fas fa-paper-plane"></i> Submit Application';
+          }
+        });
+
+      // Close modal when clicking outside
+      document
+        .getElementById("applicationModal")
+        .addEventListener("click", (e) => {
+          if (e.target.id === "applicationModal") {
+            closeApplicationModal();
+          }
+        });
+
+      // Initialize
+      checkAuth();
+      loadJobsFromAPI(); // Load jobs from API and merge with hardcoded
+    </script>
+  </body>
+</html>

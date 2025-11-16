@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - JobFinder</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .profile-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+      }
+      .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: #667eea;
+        margin: 0 auto 20px;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+      .profile-info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+      }
+      .profile-info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+      .info-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .info-item:last-child {
+        border-bottom: none;
+      }
+      .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f0f4ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: #667eea;
+      }
+      .info-label {
+        font-weight: 600;
+        color: #333;
+        margin-right: 10px;
+        min-width: 120px;
+      }
+      .info-value {
+        color: #666;
+      }
+      .edit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+      .edit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+      .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+      }
+      .stat-label {
+        color: #666;
+        font-size: 14px;
+      }
+      .applications-section {
+        margin-top: 30px;
+      }
+      .application-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+      }
+      .application-card:hover {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+      }
+      .status-badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+      }
+      .status-pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status-approved {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      /* Edit Profile Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .edit-modal {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.5rem;
+      }
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s;
+      }
+      .close-modal:hover {
+        color: #333;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: border-color 0.3s;
+        font-family: inherit;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .success-message {
+        display: none;
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .error-message {
+        display: none;
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .resume-upload-section {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      .resume-file-info {
+        margin-top: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        display: none;
+      }
+      .resume-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .resume-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <section>
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">
+          <img src="/image/image.png" class="logo" alt="JobFinder Logo" />JobFinder
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/viewjob.html">Jobs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/profile.html">Profile</a>
+            </li>
+            <li class="nav-item" id="adminNavItem" style="display: none;">
+              <a class="nav-link" href="/admin.html" id="adminLink" style="color: #667eea !important; font-weight: 600;">
+                <i class="fas fa-user-shield"></i> Admin
+              </a>
+            </li>
+            <li class="nav-item" id="authNavItem">
+              <a class="nav-link" href="/login.html" id="authLink">Login</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </section>
+
+    <div class="profile-container">
+      <div class="profile-header text-center">
+        <div class="profile-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <h2 id="userName">Loading...</h2>
+        <p id="userEmail" style="opacity: 0.9; margin-top: 10px;">Loading...</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="applicationsCount">0</div>
+          <div class="stat-label">Applications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="savedJobsCount">0</div>
+          <div class="stat-label">Saved Jobs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="interviewsCount">0</div>
+          <div class="stat-label">Interviews</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="profile-info-card">
+            <h4 style="margin-bottom: 20px; color: #333;">
+              <i class="fas fa-user-circle"></i> Personal Information
+            </h4>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-envelope"></i></div>
+              <div>
+                <span class="info-label">Email:</span>
+                <span class="info-value" id="displayEmail">-</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-user"></i></div>
+              <div>
+                <span class="info-label">Name:</span>
+                <span class="info-value" id="displayName">-</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-phone"></i></div>
+              <div>
+                <span class="info-label">Phone:</span>
+                <span class="info-value" id="displayPhone">-</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-calendar"></i></div>
+              <div>
+                <span class="info-label">Member Since:</span>
+                <span class="info-value" id="memberSince">-</span>
+              </div>
+            </div>
+            <button class="edit-btn mt-3" onclick="editProfile()">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="profile-info-card">
+            <h4 style="margin-bottom: 20px; color: #333;">
+              <i class="fas fa-briefcase"></i> Career Information
+            </h4>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-graduation-cap"></i></div>
+              <div>
+                <span class="info-label">Education:</span>
+                <span class="info-value" id="displayEducation">Not specified</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-code"></i></div>
+              <div>
+                <span class="info-label">Skills:</span>
+                <span class="info-value" id="displaySkills">Not specified</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div>
+                <span class="info-label">Location:</span>
+                <span class="info-value" id="displayLocation">Not specified</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i class="fas fa-file-alt"></i></div>
+              <div>
+                <span class="info-label">Resume:</span>
+                <span class="info-value" id="resumeDisplay">
+                  <a href="#" id="resumeLink" class="resume-link" target="_blank" style="display: none;">View Resume</a>
+                  <a href="#" id="uploadResumeLink" class="resume-link" onclick="event.preventDefault(); uploadResume();">Upload Resume</a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="applications-section">
+        <h3 style="color: #333; margin-bottom: 20px;">
+          <i class="fas fa-clipboard-list"></i> Recent Applications
+        </h3>
+        <div id="applicationsList">
+          <div class="application-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 style="color: #333; margin-bottom: 5px;">Software Developer Intern</h5>
+                <p style="color: #666; margin: 0;">Tech Corp Inc. • San Francisco, CA</p>
+              </div>
+              <span class="status-badge status-pending">Pending</span>
+            </div>
+          </div>
+          <div class="application-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 style="color: #333; margin-bottom: 5px;">Frontend Developer</h5>
+                <p style="color: #666; margin: 0;">Design Studio • New York, NY</p>
+              </div>
+              <span class="status-badge status-approved">Approved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+      <div class="edit-modal">
+        <div class="modal-header">
+          <h3>Edit Profile</h3>
+          <button class="close-modal" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="success-message" id="editSuccessMessage">
+          <i class="fas fa-check-circle"></i> Profile updated successfully!
+        </div>
+        <div class="error-message" id="editErrorMessage">
+          <i class="fas fa-exclamation-circle"></i> <span id="editErrorText">An error occurred.</span>
+        </div>
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label for="editFirstName">First Name *</label>
+            <input type="text" id="editFirstName" name="firstName" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="editLastName">Last Name *</label>
+            <input type="text" id="editLastName" name="lastName" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="editPhone">Phone Number</label>
+            <input type="tel" id="editPhone" name="phone" />
+          </div>
+          
+          <div class="form-group">
+            <label for="editEducation">Education</label>
+            <input type="text" id="editEducation" name="education" placeholder="e.g., B.Tech Computer Science" />
+          </div>
+          
+          <div class="form-group">
+            <label for="editSkills">Skills</label>
+            <textarea id="editSkills" name="skills" placeholder="e.g., JavaScript, React, Node.js, Python"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="editLocation">Location</label>
+            <input type="text" id="editLocation" name="location" placeholder="e.g., Bangalore, Karnataka" />
+          </div>
+          
+          <button type="submit" class="submit-btn" id="submitProfileBtn">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resume Upload Modal -->
+    <div class="modal-overlay" id="resumeUploadModal">
+      <div class="edit-modal">
+        <div class="modal-header">
+          <h3>Upload Resume</h3>
+          <button class="close-modal" onclick="closeResumeModal()">&times;</button>
+        </div>
+        <div class="success-message" id="resumeSuccessMessage">
+          <i class="fas fa-check-circle"></i> Resume uploaded successfully!
+        </div>
+        <div class="error-message" id="resumeErrorMessage">
+          <i class="fas fa-exclamation-circle"></i> <span id="resumeErrorText">An error occurred.</span>
+        </div>
+        <form id="resumeUploadForm">
+          <div class="form-group">
+            <label for="resumeFileInput">Select Resume File *</label>
+            <input type="file" id="resumeFileInput" name="resumeFile" accept=".pdf,.doc,.docx" required />
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+              Accepted formats: PDF, DOC, DOCX (Max 5MB)
+            </small>
+            <div id="resumeFileInfo" class="resume-file-info">
+              <i class="fas fa-file"></i> <span id="resumeFileName"></span>
+            </div>
+          </div>
+          
+          <button type="submit" class="submit-btn" id="submitResumeBtn">
+            <i class="fas fa-upload"></i> Upload Resume
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Initialize Supabase
+      const supabaseUrl = 'https://anhstuyagypchntxujrq.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuaHN0dXlhZ3lwY2hudHh1anJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMzA2MDEsImV4cCI6MjA3ODgwNjYwMX0.mZwhowUemXQnNYR3cudtlmICiO2EcwzQfm1NZYWK8q8';
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+      // Load user profile
+      async function loadProfile() {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          
+          if (error || !user) {
+            window.location.href = '/login.html';
+            return;
+          }
+
+          // Update header
+          document.getElementById('userName').textContent = 
+            user.user_metadata?.first_name && user.user_metadata?.last_name
+              ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+              : user.email?.split('@')[0] || 'User';
+          document.getElementById('userEmail').textContent = user.email;
+          
+          // Update profile info
+          document.getElementById('displayEmail').textContent = user.email;
+          document.getElementById('displayName').textContent = 
+            user.user_metadata?.first_name && user.user_metadata?.last_name
+              ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+              : 'Not specified';
+          document.getElementById('displayPhone').textContent = 
+            user.user_metadata?.phone || 'Not specified';
+          
+          // Update career info
+          document.getElementById('displayEducation').textContent = 
+            user.user_metadata?.education || 'Not specified';
+          document.getElementById('displaySkills').textContent = 
+            user.user_metadata?.skills || 'Not specified';
+          document.getElementById('displayLocation').textContent = 
+            user.user_metadata?.location || 'Not specified';
+          
+          // Update resume display
+          if (user.user_metadata?.resume_url) {
+            document.getElementById('resumeLink').href = user.user_metadata.resume_url;
+            document.getElementById('resumeLink').target = '_blank';
+            document.getElementById('resumeLink').style.display = 'inline';
+            document.getElementById('uploadResumeLink').textContent = 'Update Resume';
+            document.getElementById('uploadResumeLink').style.marginLeft = '10px';
+          } else {
+            document.getElementById('resumeLink').style.display = 'none';
+            document.getElementById('uploadResumeLink').textContent = 'Upload Resume';
+            document.getElementById('uploadResumeLink').style.marginLeft = '0';
+          }
+          
+          const memberDate = new Date(user.created_at);
+          document.getElementById('memberSince').textContent = 
+            memberDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+          // Update auth link
+          const authLink = document.getElementById('authLink');
+          authLink.textContent = 'Logout';
+          authLink.href = '#';
+          authLink.onclick = async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+          };
+
+          // Check if user is admin and show admin button
+          const isAdmin = user.user_metadata?.is_admin || true;
+          if (isAdmin) {
+            document.getElementById('adminNavItem').style.display = 'block';
+          }
+
+          await loadUserApplications(user.email);
+
+        } catch (error) {
+          console.error('Error loading profile:', error);
+        }
+      }
+
+      async function loadUserApplications(email) {
+        try {
+          const res = await fetch(`/api/admin/applications?email=${encodeURIComponent(email)}`);
+          const json = await res.json();
+          const list = json.applications || [];
+          const container = document.getElementById('applicationsList');
+          if (!list.length) {
+            container.innerHTML = '<p style="color:#666">No applications yet.</p>';
+            return;
+          }
+          container.innerHTML = list.slice(0, 10).map(a => `
+            <div class="application-card">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 style="color:#333;margin-bottom:5px;">${a.jobTitle || ''}</h5>
+                  <p style="color:#666;margin:0;">${a.companyName || ''}</p>
+                </div>
+                <span class="status-badge ${a.status === 'accepted' ? 'status-approved' : a.status === 'rejected' ? 'status-rejected' : 'status-pending'}">${a.status}</span>
+              </div>
+            </div>
+          `).join('');
+        } catch (e) {}
+      }
+
+      // Edit Profile Functions
+      function editProfile() {
+        // Get current user data
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            // Populate form with current data
+            const names = user.user_metadata?.first_name && user.user_metadata?.last_name
+              ? user.user_metadata.first_name.split(' ')
+              : ['', ''];
+            
+            document.getElementById('editFirstName').value = user.user_metadata?.first_name || '';
+            document.getElementById('editLastName').value = user.user_metadata?.last_name || '';
+            document.getElementById('editPhone').value = user.user_metadata?.phone || '';
+            document.getElementById('editEducation').value = user.user_metadata?.education || '';
+            document.getElementById('editSkills').value = user.user_metadata?.skills || '';
+            document.getElementById('editLocation').value = user.user_metadata?.location || '';
+            
+            // Show modal
+            document.getElementById('editProfileModal').classList.add('active');
+            document.getElementById('editSuccessMessage').style.display = 'none';
+            document.getElementById('editErrorMessage').style.display = 'none';
+          }
+        });
+      }
+
+      function closeEditModal() {
+        document.getElementById('editProfileModal').classList.remove('active');
+        document.getElementById('editProfileForm').reset();
+      }
+
+      // Handle edit profile form submission
+      document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitProfileBtn');
+        const successMsg = document.getElementById('editSuccessMessage');
+        const errorMsg = document.getElementById('editErrorMessage');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+        successMsg.style.display = 'none';
+        errorMsg.style.display = 'none';
+
+        const formData = {
+          firstName: document.getElementById('editFirstName').value,
+          lastName: document.getElementById('editLastName').value,
+          phone: document.getElementById('editPhone').value,
+          education: document.getElementById('editEducation').value,
+          skills: document.getElementById('editSkills').value,
+          location: document.getElementById('editLocation').value
+        };
+
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('User not found');
+
+          const { data, error } = await supabase.auth.updateUser({
+            data: {
+              ...user.user_metadata, // Preserve existing metadata
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              phone: formData.phone,
+              education: formData.education,
+              skills: formData.skills,
+              location: formData.location
+            }
+          });
+
+          if (error) throw error;
+
+          // Update UI
+          loadProfile();
+          successMsg.style.display = 'block';
+          
+          setTimeout(() => {
+            closeEditModal();
+          }, 1500);
+        } catch (error) {
+          document.getElementById('editErrorText').textContent = error.message || 'Failed to update profile';
+          errorMsg.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+      });
+
+      // Resume Upload Functions
+      function uploadResume() {
+        document.getElementById('resumeUploadModal').classList.add('active');
+        document.getElementById('resumeSuccessMessage').style.display = 'none';
+        document.getElementById('resumeErrorMessage').style.display = 'none';
+        document.getElementById('resumeFileInput').value = '';
+        document.getElementById('resumeFileInfo').style.display = 'none';
+      }
+
+      function closeResumeModal() {
+        document.getElementById('resumeUploadModal').classList.remove('active');
+        document.getElementById('resumeUploadForm').reset();
+        document.getElementById('resumeFileInfo').style.display = 'none';
+      }
+
+      // Show file name when selected
+      document.getElementById('resumeFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            e.target.value = '';
+            document.getElementById('resumeFileInfo').style.display = 'none';
+            return;
+          }
+          document.getElementById('resumeFileName').textContent = file.name;
+          document.getElementById('resumeFileInfo').style.display = 'block';
+        }
+      });
+
+      // Handle resume upload form submission
+      document.getElementById('resumeUploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitResumeBtn');
+        const successMsg = document.getElementById('resumeSuccessMessage');
+        const errorMsg = document.getElementById('resumeErrorMessage');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        
+        successMsg.style.display = 'none';
+        errorMsg.style.display = 'none';
+
+        const file = document.getElementById('resumeFileInput').files[0];
+        if (!file) {
+          document.getElementById('resumeErrorText').textContent = 'Please select a file';
+          errorMsg.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Resume';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('resumeFile', file);
+
+        try {
+          const response = await fetch('/api/profile/upload-resume', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            // Update user metadata with resume URL
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase.auth.updateUser({
+                data: {
+                  ...user.user_metadata,
+                  resume_url: result.resumeUrl
+                }
+              });
+            }
+            
+            loadProfile();
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+              closeResumeModal();
+            }, 1500);
+          } else {
+            document.getElementById('resumeErrorText').textContent = result.error || 'Failed to upload resume';
+            errorMsg.style.display = 'block';
+          }
+        } catch (error) {
+          document.getElementById('resumeErrorText').textContent = 'Network error. Please try again.';
+          errorMsg.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Resume';
+        }
+      });
+
+      // Close modals when clicking outside
+      document.getElementById('editProfileModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editProfileModal') closeEditModal();
+      });
+
+      document.getElementById('resumeUploadModal').addEventListener('click', (e) => {
+        if (e.target.id === 'resumeUploadModal') closeResumeModal();
+      });
+
+      // Load profile on page load
+      loadProfile();
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Certification cards — Responsive Slider</title>
+        <style>
+          :root {
+            --bg: #f6f9fb;
+            --card: #fff;
+            --accent: #2b82ff;
+            --muted: #6b7280;
+            --radius: 14px;
+            --card-padding: 18px;
+            --shadow: 0 6px 18px rgba(18, 38, 63, 0.06);
+          }
+
+          body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+              "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, var(--bg), #ffffff 40%);
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+            padding: 28px;
+            box-sizing: border-box;
+          }
+
+          .container {
+            max-width: 1100px;
+            margin: 0 auto;
+          }
+
+          h1 {
+            margin: 0 0 18px;
+            font-size: 20px;
+            font-weight: 600;
+          }
+
+          /* Slider viewport */
+          .carousel {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 6px;
+          }
+
+          /* track and slide sizing — JS adjusts transform */
+          .track {
+            display: flex;
+            gap: 18px;
+            transition: transform 450ms cubic-bezier(0.2, 0.9, 0.2, 1);
+            will-change: transform;
+            touch-action: pan-y;
+          }
+
+          /* card */
+          .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 260px;
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(15, 23, 42, 0.03);
+          }
+
+          .card-hero {
+            background: linear-gradient(180deg, #e9f1ff, #f6fbff);
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+          }
+
+          .code-block {
+            width: 68px;
+            height: 66px;
+            background: #1f6feb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-family: monospace;
+            box-shadow: inset 0 -6px 20px rgba(0, 0, 0, 0.06);
+          }
+
+          .hero-image {
+            width: 78px;
+            height: 56px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #a8d9a8, #80b6ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 12px;
+          }
+
+          .card-body {
+            padding: var(--card-padding);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+
+          .duration {
+            color: var(--muted);
+            font-size: 13px;
+          }
+
+          .title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 2px;
+          }
+
+          .meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 14px;
+          }
+
+          .star {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #f5b328;
+          }
+
+          .know-more {
+            margin-top: 6px;
+            align-self: flex-start;
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+          }
+
+          /* Controls */
+          .controls {
+            position: absolute;
+            top: 50%;
+            left: 8px;
+            right: 8px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border: 0;
+            padding: 8px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .btn svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+          }
+
+          /* dots */
+          .dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 14px;
+          }
+          .dot {
+            width: 38px;
+            height: 6px;
+            background: rgba(15, 23, 42, 0.08);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 240ms ease;
+          }
+          .dot.active {
+            background: var(--accent);
+            transform: scaleX(1);
+          }
+
+          /* responsive sizing: We'll control slidesPerView in JS but we can size base card */
+          @media (max-width: 546px) {
+            .card {
+              min-width: 48%;
+            }
+            .card-hero {
+              padding: 12px;
+            }
+          }
+          @media (max-width: 546px) {
+            .card {
+              min-width: 92%;
+            }
+          }
+
+          /* small helper for rating */
+          .muted-small {
+            color: var(--muted);
+            font-size: 13px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Certification courses for you</h1>
+
+          <div class="carousel" id="carousel">
+            <div class="track" id="track">
+              <!-- Card 1 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;/&gt;</div>
+                  <div class="hero-image">AI + Web</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">8 weeks</div>
+                  <div class="title">Web Development with AI</div>
+                  <div class="meta">
+                    <div class="star">★ 4.5</div>
+                    <div class="muted-small">126,115 Enrolled</div>
+                  </div>
+                </div>
+               
+              </article>
+
+              <!-- Card 2 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;React/&gt;</div>
+                  <div class="hero-image">Frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">6 weeks</div>
+                  <div class="title">Modern React Bootcamp</div>
+                  <div class="meta">
+                    <div class="star">★ 4.7</div>
+                    <div class="muted-small">78,442 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 3 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">php</div>
+                  <div class="hero-image">Backend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">10 weeks</div>
+                  <div class="title">Fullstack PHP & Databases</div>
+                  <div class="meta">
+                    <div class="star">★ 4.4</div>
+                    <div class="muted-small">54,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 4 -->
+              <article class="card">    
+                <div class="card-hero">
+                  <div class="code-block">DB</div>
+                  <div class="hero-image">Data</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">7 weeks</div>
+                  <div class="title">SQL & Data Modeling</div>
+                  <div class="meta">
+                    <div class="star">★ 4.6</div>
+                    <div class="muted-small">29,012 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 5 -->
+              <article class="card">                                                        
+                <div class="card-hero">
+                  <div class="code-block">UX</div>
+                  <div class="hero-image">Design</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">5 weeks</div>
+                  <div class="title">UX/UI Essentials</div>
+                  <div class="meta">
+                    <div class="star">★ 4.8</div>
+                    <div class="muted-small">18,981 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+              <!-- Card 6-->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">html</div>
+                  <div class="hero-image">frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">1 days</div>
+                  <div class="title">Junior Engineer Developer</div>
+                  <div class="meta">
+                    <div class="star">★ 4.9</div>
+                    <div class="muted-small">4,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+            </div> <br>
+        <div class="container">
+          <h1>Certification courses for you</h1>
+
+          <div class="carousel" id="carousel">
+            <div class="track" id="track">
+              <!-- Card 1 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;/&gt;</div>
+                  <div class="hero-image">AI + Web</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">8 weeks</div>
+                  <div class="title">Web Development with AI</div>
+                  <div class="meta">
+                    <div class="star">★ 4.5</div>
+                    <div class="muted-small">126,115 Enrolled</div>
+                  </div>
+                </div>
+               
+              </article>
+
+              <!-- Card 2 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;React/&gt;</div>
+                  <div class="hero-image">Frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">6 weeks</div>
+                  <div class="title">Modern React Bootcamp</div>
+                  <div class="meta">
+                    <div class="star">★ 4.7</div>
+                    <div class="muted-small">78,442 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 3 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">php</div>
+                  <div class="hero-image">Backend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">10 weeks</div>
+                  <div class="title">Fullstack PHP & Databases</div>
+                  <div class="meta">
+                    <div class="star">★ 4.4</div>
+                    <div class="muted-small">54,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 4 -->
+              <article class="card">    
+                <div class="card-hero">
+                  <div class="code-block">DB</div>
+                  <div class="hero-image">Data</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">7 weeks</div>
+                  <div class="title">SQL & Data Modeling</div>
+                  <div class="meta">
+                    <div class="star">★ 4.6</div>
+                    <div class="muted-small">29,012 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 5 -->
+              <article class="card">                                                        
+                <div class="card-hero">
+                  <div class="code-block">UX</div>
+                  <div class="hero-image">Design</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">5 weeks</div>
+                  <div class="title">UX/UI Essentials</div>
+                  <div class="meta">
+                    <div class="star">★ 4.8</div>
+                    <div class="muted-small">18,981 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+              <!-- Card 6-->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">html</div>
+                  <div class="hero-image">frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">1 days</div>
+                  <div class="title">Junior Engineer Developer</div>
+                  <div class="meta">
+                    <div class="star">★ 4.9</div>
+                    <div class="muted-small">4,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+            </div> <br>
+        <div class="container">
+          <h1>Certification courses for you</h1>
+
+          <div class="carousel" id="carousel">
+            <div class="track" id="track">
+              <!-- Card 1 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;/&gt;</div>
+                  <div class="hero-image">AI + Web</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">8 weeks</div>
+                  <div class="title">Web Development with AI</div>
+                  <div class="meta">
+                    <div class="star">★ 4.5</div>
+                    <div class="muted-small">126,115 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 2 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">&lt;React/&gt;</div>
+                  <div class="hero-image">Frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">6 weeks</div>
+                  <div class="title">Modern React Bootcamp</div>
+                  <div class="meta">
+                    <div class="star">★ 4.7</div>
+                    <div class="muted-small">78,442 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 3 -->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">php</div>
+                  <div class="hero-image">Backend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">10 weeks</div>
+                  <div class="title">Fullstack PHP & Databases</div>
+                  <div class="meta">
+                    <div class="star">★ 4.4</div>
+                    <div class="muted-small">54,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 4 -->
+              <article class="card">    
+                <div class="card-hero">
+                  <div class="code-block">DB</div>
+                  <div class="hero-image">Data</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">7 weeks</div>
+                  <div class="title">SQL & Data Modeling</div>
+                  <div class="meta">
+                    <div class="star">★ 4.6</div>
+                    <div class="muted-small">29,012 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Card 5 -->
+              <article class="card">                                                        
+                <div class="card-hero">
+                  <div class="code-block">UX</div>
+                  <div class="hero-image">Design</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">5 weeks</div>
+                  <div class="title">UX/UI Essentials</div>
+                  <div class="meta">
+                    <div class="star">★ 4.8</div>
+                    <div class="muted-small">18,981 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+              <!-- Card 6-->
+              <article class="card">
+                <div class="card-hero">
+                  <div class="code-block">html</div>
+                  <div class="hero-image">frontend</div>
+                </div>
+                <div class="card-body">
+                  <div class="duration">1 days</div>
+                  <div class="title">Junior Engineer Developer</div>
+                  <div class="meta">
+                    <div class="star">★ 4.9</div>
+                    <div class="muted-small">4,320 Enrolled</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <!-- track -->
+
+            <!-- controls -->
+            <div class="controls" aria-hidden="true">
+              <button class="btn" id="prev" aria-label="Previous slide">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <button class="btn" id="next" aria-label="Next slide">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M9 6l6 6-6 6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- carousel -->
+
+          <!-- dots -->
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <script>
+          (function () {
+            const track = document.getElementById("track");
+            const prevBtn = document.getElementById("prev");
+            const nextBtn = document.getElementById("next");
+            const dotsWrap = document.getElementById("dots");
+            const carousel = document.getElementById("carousel");
+            const slides = Array.from(track.children);
+            let slidesPerView = getSlidesPerView();
+            let index = 0; // page index (not card index)
+            let autoplayInterval = null;
+            const gap = 18; // px, same as CSS gap
+
+            function getSlidesPerView() {
+              const w = window.innerWidth;
+              if (w < 640) return 1;
+              if (w < 900) return 2;
+              return 3;
+            }
+
+            function updateSizes() {
+              slidesPerView = getSlidesPerView();
+              // compute slide width (min-width is used in CSS), but we'll compute the translate % for pages
+              // number of pages
+              const pages = Math.max(
+                1,
+                Math.ceil(slides.length / slidesPerView)
+              );
+              // rebuild dots
+              buildDots(pages);
+              // ensure index in range
+              if (index >= pages) index = pages - 1;
+              goTo(index, false);
+            }
+
+            function buildDots(pages) {
+              dotsWrap.innerHTML = "";
+              for (let i = 0; i < pages; i++) {
+                const d = document.createElement("div");
+                d.className = "dot";
+                d.dataset.idx = i;
+                if (i === index) d.classList.add("active");
+                d.addEventListener("click", () => {
+                  goTo(i);
+                  resetAutoplay();
+                });
+                dotsWrap.appendChild(d);
+              }
+            }
+
+            function goTo(pageIndex, animate = true) {
+              const total = slides.length;
+              const pages = Math.max(1, Math.ceil(total / slidesPerView));
+              pageIndex = Math.max(0, Math.min(pageIndex, pages - 1));
+              index = pageIndex;
+
+              // percent translate: each page moves by (100 / pages) * pageIndex
+              const percent = pageIndex * 100;
+              // We will set transform using calc: translateX(-pageIndex * (100 / pages)%)
+              // But simpler: compute card width in px and translate by cardWidth * slidesPerView * pageIndex
+              const trackRect = track.getBoundingClientRect();
+              // compute one card's outer width (including gap)
+              const firstCard = slides[0];
+              const cardRect = firstCard.getBoundingClientRect();
+              const cardWidth = cardRect.width + gap;
+              const offset = pageIndex * slidesPerView * cardWidth;
+              // clamp offset max so we don't leave blank space at end
+              const maxOffset = Math.max(
+                0,
+                cardWidth * slides.length - carousel.clientWidth
+              );
+              const finalOffset = Math.min(offset, maxOffset);
+              if (!animate) track.style.transition = "none";
+              else track.style.transition = "";
+              track.style.transform = `translateX(${-finalOffset}px)`;
+
+              // update dots
+              Array.from(dotsWrap.children).forEach((d, i) =>
+                d.classList.toggle("active", i === index)
+              );
+            }
+
+            prevBtn.addEventListener("click", () => {
+              goTo(index - 1);
+              resetAutoplay();
+            });
+            nextBtn.addEventListener("click", () => {
+              goTo(index + 1);
+              resetAutoplay();
+            });
+
+            // autoplay
+            function startAutoplay() {
+              stopAutoplay();
+              autoplayInterval = setInterval(() => {
+                const pages = Math.max(
+                  1,
+                  Math.ceil(slides.length / slidesPerView)
+                );
+                goTo((index + 1) % pages);
+              }, 4000);
+            }
+            function stopAutoplay() {
+              if (autoplayInterval) {
+                clearInterval(autoplayInterval);
+                autoplayInterval = null;
+              }
+            }
+            function resetAutoplay() {
+              stopAutoplay();
+              startAutoplay();
+            }
+
+            // swipe support
+            let pointerStart = null;
+            let pointerDx = 0;
+            track.addEventListener("pointerdown", (e) => {
+              pointerStart = e.clientX;
+              track.style.transition = "none";
+              track.setPointerCapture(e.pointerId);
+              stopAutoplay();
+            });
+            track.addEventListener("pointermove", (e) => {
+              if (pointerStart === null) return;
+              pointerDx = e.clientX - pointerStart;
+              track.style.transform = `translateX(${-Math.min(
+                Math.max(getCurrentOffset() - pointerDx, 0),
+                getMaxOffset()
+              )}px)`;
+            });
+            track.addEventListener("pointerup", (e) => {
+              if (pointerStart === null) return;
+              const threshold = 60;
+              if (pointerDx > threshold) {
+                goTo(index - 1);
+              } else if (pointerDx < -threshold) {
+                goTo(index + 1);
+              } else {
+                goTo(index);
+              }
+              pointerStart = null;
+              pointerDx = 0;
+              resetAutoplay();
+            });
+            track.addEventListener("pointercancel", () => {
+              pointerStart = null;
+              pointerDx = 0;
+              goTo(index);
+              resetAutoplay();
+            });
+            function getCurrentOffset() {
+              const style = window.getComputedStyle(track);
+              const matrix = new WebKitCSSMatrix(style.transform);
+              return Math.abs(matrix.m41);
+            }
+            function getMaxOffset() {
+              const firstCard = slides[0].getBoundingClientRect();
+              const cardWidth = firstCard.width + gap;
+              return Math.max(
+                0,
+                cardWidth * slides.length - carousel.clientWidth
+              );
+            }
+
+            // resize handling
+            let resizeTimer = null;
+            window.addEventListener("resize", () => {
+              if (resizeTimer) clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(() => {
+                // remove transition to avoid jump issues
+                track.style.transition = "none";
+                updateSizes();
+                // re-enable transition
+                setTimeout(() => (track.style.transition = ""), 50);
+              }, 120);
+            });
+
+            // Initialize
+            updateSizes();
+            // small delay to ensure sizes computed correctly after fonts/images
+            setTimeout(() => {
+              goTo(0, false);
+              startAutoplay();
+            }, 80);
+
+            // pause autoplay when mouse over carousel (desktop)
+            carousel.addEventListener("mouseenter", stopAutoplay);
+            carousel.addEventListener("mouseleave", resetAutoplay);
+          })();
+        </script>
+      </body>
+    </html>
+  </body>
+</html>

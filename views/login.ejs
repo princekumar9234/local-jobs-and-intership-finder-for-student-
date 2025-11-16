@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        background-color: #1e1d21;
+        overflow: hidden;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: 0;
+      }
+      :root {
+        --primary-color: #2a6fdb;
+        --secondary-color: #28a745;
+        --accent-color: #ffc107;
+        --background-color: #f0f2f5;
+      }
+
+      /* ➡ Navbar Styling */
+      .navbar {
+        background-color: var(--background-color);
+
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        color: var(--primary-color) !important;
+        font-weight: bold;
+        transition: color 0.3s ease;
+      }
+      .navbar-brand:hover {
+        color: var(--accent-color) !important;
+      }
+      .nav-link {
+        color: #333 !important;
+        transition: color 0.3s ease, border-bottom 0.3s ease;
+      }
+      .nav-link:hover {
+        color: var(--primary-color) !important;
+        border-bottom: 2px solid var(--primary-color);
+      }
+
+      .jumbotron {
+        background: linear-gradient(135deg, var(--primary-color), #4e90fe);
+        color: white;
+        border-radius: 15px;
+        padding: 4rem 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        animation: fadeIn 1s ease-out;
+      }
+
+      /* 🏷 Tabs Styling */
+      .nav-tabs {
+        border-bottom: 2px solid #ddd;
+      }
+      .nav-tabs .nav-link {
+        border: none;
+        color: #555;
+        margin-bottom: -2px;
+      }
+      .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        border-bottom: 3px solid var(--primary-color);
+        font-weight: bold;
+        background-color: #ffffff;
+      }
+
+      /* Background */
+      .bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        z-index: -1;
+      }
+
+      /* Glass effect login box */
+      .login-box {
+        width: 350px;
+        padding: 30px;
+        margin: auto;
+        margin-top: 7%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+        color: white;
+      }
+
+      .login-box h2 {
+        margin-bottom: 25px;
+      }
+
+      /* Input box */
+      .input-box {
+        position: relative;
+        width: 100%;
+        margin: 15px 0;
+      }
+
+      .input-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+      }
+
+      .input-box input {
+        width: 100%;
+        padding: 12px 40px;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 15px;
+      }
+
+      .input-box input::placeholder {
+        color: #ddd;
+      }
+
+      /* Options row */
+      .options {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin: 10px 0;
+      }
+
+      .options a {
+        color: #fff;
+        text-decoration: none;
+      }
+
+      /* Login Button */
+      .login-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+        background: rgb(73, 72, 72);
+        color: #5a00ff;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .login-btn:hover {
+        opacity: 0.8;
+      }
+
+      /* Register text */
+      .register {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+
+      .register a {
+        color: yellow;
+        text-decoration: none;
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .login-box {
+          width: 90%;
+          margin-top: 20%;
+          padding: 25px;
+        }
+      }
+      .logo {
+        height: 40px;
+        width: 40px;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <section>
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/"
+          ><img src="/image/image.png" class="logo" alt="JobFinder Logo" />JobFinder</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.ejs">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="signup.ejs">signup</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </section>
+    <div class="bg"></div>
+    <div class="login-box">
+      <h2>Login</h2>
+
+      <form id="loginForm">
+        <div class="input-box">
+          <i class="fa fa-envelope"></i>
+          <input type="email" id="email" name="email" placeholder="Email" required />
+        </div>
+
+        <div class="input-box">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="password" name="password" placeholder="Password" required />
+        </div>
+
+        <div class="options">
+          <label><input type="checkbox" /> Remember me</label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <div id="errorMessage" style="color: #ff6b6b; margin: 10px 0; display: none;"></div>
+        <div id="successMessage" style="color: #51cf66; margin: 10px 0; display: none;"></div>
+
+        <button type="submit" class="login-btn">Login</button>
+      </form>
+
+      <p class="register">Don't have an account? <a href="/signup.html">Register</a></p>
+    </div>
+
+    <script>
+      // Initialize Supabase client
+      const supabaseUrl = 'https://anhstuyagypchntxujrq.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuaHN0dXlhZ3lwY2hudHh1anJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMzA2MDEsImV4cCI6MjA3ODgwNjYwMX0.mZwhowUemXQnNYR3cudtlmICiO2EcwzQfm1NZYWK8q8';
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+      // Handle login form submission
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        // Hide previous messages
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+          if (error) {
+            errorMessage.textContent = error.message;
+            errorMessage.style.display = 'block';
+          } else {
+            successMessage.textContent = 'Login successful! Redirecting...';
+            successMessage.style.display = 'block';
+            
+            // Store session
+            localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+            
+            // Redirect to home page after 1 second
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 1000);
+          }
+        } catch (error) {
+          errorMessage.textContent = 'An error occurred. Please try again.';
+          errorMessage.style.display = 'block';
+        }
+      });
+
+      // Check if user is already logged in
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.location.href = '/';
+        }
+      });
+    </script>
+  </body>
+</html>
